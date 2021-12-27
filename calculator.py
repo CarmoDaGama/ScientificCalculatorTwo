@@ -32,32 +32,33 @@ def calc(number1, number2, operator):
         return number1 - number2
     elif operator == '+':
         return number1 + number2
-
-
-def calculate_expression(expression):
-    global operators
-    expressions = get_list_expression(expression)
+def contains_operator(expressions):
     for operator in operators:
-        count = 0
-        try:
-            while operator in expressions:
-                if operator == expressions[count]:
-                    print(f'{expressions[count - 1]} {expressions[count]} {expressions[count + 1]}')
-                    result = calc(float(expressions[count - 1]), float(expressions[count + 1]), expressions[count])
-                    expressions.pop(count - 1)
-                    expressions.pop(count)
-                    expressions.pop(count + 1)
-                    expressions.insert(0, result)
-                    count = 0
+        if operator in expressions:
+            return True
+    return False
+
+def calculate_expression(l_expression):
+    for operator in operators:
+        while operator in l_expression:
+            index_operator = l_expression.index(operator)
+            result = calc(float(l_expression[index_operator - 1]), float(l_expression[index_operator + 1]), operator)
+            tmp_expression = []
+
+            for index, value in enumerate(l_expression):
+                if index == index_operator - 1 or index == index_operator + 1:
+                    continue
+                elif index == index_operator:
+                    tmp_expression.append(result)
                 else:
-                    count += 1
-                    if len(expressions) == 0:
-                        break
-        except Exception as error:
-            print(f'Length: {len(expressions)}')
-            print(f'Count: {count}')
-            print(expressions)
-            print(f'Error: {error.__class__}')
+                    tmp_expression.append(value)
+            l_expression.clear()
+            l_expression = tmp_expression.copy()
+            tmp_expression.clear()
+    if contains_operator(l_expression):
+        calculate_expression(l_expression)
+    else:
+        return float(l_expression[0])
 
 
 def ValidExpression(expression):
@@ -90,58 +91,37 @@ def add_in_list(list, data):
 
 def order_precedence(list_expression):
     potencies = []
-    products = []
-    divisions = []
-    sums = []
-    substractions = []
-    print(len(list_expression))
-    for index in range(0, len(list_expression)-1):
-        print(index)
-        if list_expression[index] == '^':
-            potencies.append(list_expression[index - 1])
-            potencies.append(list_expression[index])
-            potencies.append(list_expression[index + 1])
-        if list_expression[index] == '*':
-            products.append(list_expression[index - 1])
-            products.append(list_expression[index])
-            products.append(list_expression[index + 1])
-        if list_expression[index] == '/':
-            divisions.append(list_expression[index - 1])
-            divisions.append(list_expression[index])
-            divisions.append(list_expression[index + 1])
-        if list_expression[index] == '+':
-            sums.append(list_expression[index - 1])
-            sums.append(list_expression[index])
-            sums.append(list_expression[index + 1])
-        if list_expression[index] == '-':
-            substractions.append(list_expression[index - 1])
-            substractions.append(list_expression[index])
-            substractions.append(list_expression[index + 1])
-            list_expression = []
-    add_in_list(list_expression, potencies)
-    add_in_list(list_expression, products)
-    add_in_list(list_expression, divisions)
-    add_in_list(list_expression, substractions)
+
+
+
+def print_expressions(l_expression):
+    print('\n\nValues: ', end='')
+    for index, value in enumerate(l_expression):
+        print(value, end='|')
+
+    print('\n')
+    print('Indexs: ', end='')
+    for index, value in enumerate(l_expression):
+        print(f'{index}', end='|')
+
+
+def idea_optional(expressions):
+    for index, value in enumerate(expressions):
+        if value == '-' and not('-' in str(expressions[index + 1])):
+            expressions[index + 1] = float(expressions[index + 1])*-1
+            expressions[index] = '+'
+
+
+
 
 # 5^2+4-5-77+55*79/93
 
 
 expression = str(input('Type it Expression: '))
+
+
 l_expression = get_list_expression(expression)
 print(l_expression)
-
-order_precedence(l_expression)
-def mm():
-    for operator in operators:
-        while(l_expression.index(operator) >= 0):
-            result = calc(float(l_expression[0]), float(l_expression[2]), l_expression[1])
-            del(l_expression[0])
-            del(l_expression[1])
-            del(l_expression[2])
-            l_expression.insert(0, str(result))
-            if len(l_expression) <= 1:
-                break
-
-
-
-print(l_expression)
+idea_optional(l_expression)
+l_expression = calculate_expression(l_expression.copy())
+print(f'\n\nFinal Result: {l_expression:.2f}')
