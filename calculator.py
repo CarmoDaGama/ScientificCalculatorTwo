@@ -5,14 +5,24 @@ def get_list_expression(expression):
     global operators
     expression_list = []
     member = ''
-    for character in expression:
-        if character in operators:
-            if member.isnumeric():
+    for index, character in enumerate(expression):
+
+        if character == '(':
+            expression_list.append(character)
+        elif character == ')':
+            if member != '':
                 expression_list.append(member)
+            expression_list.append(character)
+            member = ''
+        elif character in operators:
+            if member.isnumeric() or member == '':
+                if expression[index - 1] != ')' and member != '':
+                    expression_list.append(member)
                 expression_list.append(character)
             member = ''
         else:
             if character.isnumeric():
+                print(character, end='...')
                 member += character
 
     if member.isnumeric():
@@ -67,7 +77,7 @@ def calculate_expression(l_expression):
         return float(l_expression[0])
 
 
-def ValidExpression(expression):
+def ValidParentsExpression(expression):
     stack = []
     for symbol in expression:
         if symbol == '(':
@@ -82,21 +92,6 @@ def ValidExpression(expression):
         return True
     else:
         return False
-
-
-def details_expression(exp):
-    print('\n\n')
-    for index, value in enumerate(expression):
-        print(f'Index: {index} Value: {value}')
-    print('\n\n')
-
-def add_in_list(list, data):
-    for value in data:
-        list.append(value)
-
-
-def order_precedence(list_expression):
-    potencies = []
 
 
 
@@ -120,11 +115,11 @@ def idea_optional(expressions):
 
 
 
-# 5^2+4-5-77+55*79/93
+# 5^(2+4)-(5-77)+55*79/93
 
 
 expression = str(input('Type it Expression: '))
 
 
-expression = calculate_expression(expression)
-print(f'\n\nFinal Result: {expression:.2f}')
+# expression = calculate_expression(expression)
+print(f'\n\nFinal Result: {get_list_expression(expression)}')
