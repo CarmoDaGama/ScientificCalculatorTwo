@@ -38,23 +38,29 @@ def contains_operator(expressions):
             return True
     return False
 
+
+def replace_operation(expressions, index_operator, result):
+    tmp_expression = []
+
+    for index, value in enumerate(expressions):
+        if index == index_operator - 1 or index == index_operator + 1:
+            continue
+        elif index == index_operator:
+            tmp_expression.append(result)
+        else:
+            tmp_expression.append(value)
+    expressions.clear()
+    return tmp_expression.copy()
+
+
 def calculate_expression(l_expression):
+    l_expression = get_list_expression(l_expression)
+    idea_optional(l_expression)
     for operator in operators:
         while operator in l_expression:
             index_operator = l_expression.index(operator)
             result = calc(float(l_expression[index_operator - 1]), float(l_expression[index_operator + 1]), operator)
-            tmp_expression = []
-
-            for index, value in enumerate(l_expression):
-                if index == index_operator - 1 or index == index_operator + 1:
-                    continue
-                elif index == index_operator:
-                    tmp_expression.append(result)
-                else:
-                    tmp_expression.append(value)
-            l_expression.clear()
-            l_expression = tmp_expression.copy()
-            tmp_expression.clear()
+            l_expression = replace_operation(l_expression.copy(), index_operator, result)
     if contains_operator(l_expression):
         calculate_expression(l_expression)
     else:
@@ -80,7 +86,7 @@ def ValidExpression(expression):
 
 def details_expression(exp):
     print('\n\n')
-    for index, value in enumerate(l_expression):
+    for index, value in enumerate(expression):
         print(f'Index: {index} Value: {value}')
     print('\n\n')
 
@@ -120,8 +126,5 @@ def idea_optional(expressions):
 expression = str(input('Type it Expression: '))
 
 
-l_expression = get_list_expression(expression)
-print(l_expression)
-idea_optional(l_expression)
-l_expression = calculate_expression(l_expression.copy())
-print(f'\n\nFinal Result: {l_expression:.2f}')
+expression = calculate_expression(expression)
+print(f'\n\nFinal Result: {expression:.2f}')
