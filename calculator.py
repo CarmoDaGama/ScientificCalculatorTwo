@@ -14,15 +14,14 @@ def get_list_expression(expression):
                 expression_list.append(member)
             expression_list.append(character)
             member = ''
-        elif character in operators:
-            if member.isnumeric() or member == '':
+        elif str(character) in operators:
+            if str(member).isnumeric() or member == '':
                 if expression[index - 1] != ')' and member != '':
                     expression_list.append(member)
                 expression_list.append(character)
             member = ''
         else:
-            if character.isnumeric():
-                print(character, end='...')
+            if str(character).isnumeric():
                 member += character
 
     if member.isnumeric():
@@ -42,6 +41,8 @@ def calc(number1, number2, operator):
         return number1 - number2
     elif operator == '+':
         return number1 + number2
+
+
 def contains_operator(expressions):
     for operator in operators:
         if operator in expressions:
@@ -63,8 +64,18 @@ def replace_operation(expressions, index_operator, result):
     return tmp_expression.copy()
 
 
+def replace_expressions(expressions, start, end, result):
+    tmp_expressions = []
+    for index, value in enumerate(expressions):
+        if start == index:
+            tmp_expressions.append(result)
+        elif index < start or index > end:
+            tmp_expressions.append(value)
+
+    return tmp_expressions
+
+
 def calculate_expression(l_expression):
-    l_expression = get_list_expression(l_expression)
     idea_optional(l_expression)
     for operator in operators:
         while operator in l_expression:
@@ -94,7 +105,6 @@ def ValidParentsExpression(expression):
         return False
 
 
-
 def print_expressions(l_expression):
     print('\n\nValues: ', end='')
     for index, value in enumerate(l_expression):
@@ -115,11 +125,42 @@ def idea_optional(expressions):
 
 
 
-# 5^(2+4)-(5-77)+55*79/93
+def get_sub_list(list, start, end):
+    sub_list = []
+    for index in range(start, end + 1):
+        sub_list.append(list[index])
+    return sub_list
+
+
+def calculate_expression_parents(expressions):
+    expressions = get_list_expression(expressions)
+    while '(' in expressions:
+        count_open = count_close = start_parent = 0
+
+        for index, value in enumerate(expressions):
+            if value == '(':
+                if count_open == 0:
+                    start_parent = index
+                count_open += 1
+            elif value == ')':
+                count_close += 1
+            if count_open == count_close and count_open != 0 and count_close != 0:
+                if index == len(expressions) - 1:
+                    expressions.pop(start_parent)
+                    expressions.pop(index - 1)
+                    break
+                else:
+                    print(get_sub_list(expressions, start_parent, index))
+                    result = calculate_expression_parents(get_sub_list(expressions, start_parent, index))
+                    expressions = replace_expressions(expressions.copy(), start_parent, index, result)
+    return calculate_expression(expressions)
+
+
+# (((5^(2+4)-(5-77)+55*79/93)+70+6)+5)+(8*7/(0+5*(9+0)))
 
 
 expression = str(input('Type it Expression: '))
 
-
+# get_index_close(get_list_expression(expression), 0)
 # expression = calculate_expression(expression)
-print(f'\n\nFinal Result: {get_list_expression(expression)}')
+print(f'\n\nFinal Result: {calculate_expression_parents(expression)}')
