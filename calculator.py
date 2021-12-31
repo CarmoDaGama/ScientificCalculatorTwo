@@ -132,11 +132,21 @@ def get_sub_list(list, start, end):
     return sub_list
 
 
+def handle_sintax(expressions):
+    tmp_expression = []
+    for index, value in enumerate(expressions):
+        if value != '(' and value != ')':
+            tmp_expression.append(value)
+    expressions.clear()
+    expressions = tmp_expression
+
+
+
 def calculate_expression_parents(expressions):
     expressions = get_list_expression(expressions)
-    while '(' in expressions:
+    while '(' in expressions or ')' in expressions:
         count_open = count_close = start_parent = 0
-
+        print(expressions)
         for index, value in enumerate(expressions):
             if value == '(':
                 if count_open == 0:
@@ -150,9 +160,12 @@ def calculate_expression_parents(expressions):
                     expressions.pop(index - 1)
                     break
                 else:
-                    print(get_sub_list(expressions, start_parent, index))
+                    # print(get_sub_list(expressions, start_parent, index))
                     result = calculate_expression_parents(get_sub_list(expressions, start_parent, index))
                     expressions = replace_expressions(expressions.copy(), start_parent, index, result)
+            elif index + 1 == len(expressions):
+                handle_sintax(expressions)
+
     return calculate_expression(expressions)
 
 
